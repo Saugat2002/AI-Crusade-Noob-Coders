@@ -84,14 +84,19 @@ export const handleSignIn = async (
       }
       return res.status(400).json({
         status: 400,
-        message: "An email has been sent to your email, Please Verify using the provided Link",
+        message:
+          "An email has been sent to your email, Please Verify using the provided Link",
       });
     }
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET_KEY!);
     res.cookie("token", token, { httpOnly: true });
     res
       .status(200)
-      .json({ status: 200, message: "User signed in successfully" });
+      .json({
+        status: 200,
+        message: "User signed in successfully",
+        user: { email: user.email, fullName: user.fullName },
+      });
   });
 };
 

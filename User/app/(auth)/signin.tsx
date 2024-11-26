@@ -7,10 +7,14 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import { Link, router } from "expo-router";
+import { useUser } from "@/context/UserContext";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { user, setUser } = useUser();
+  // console.log(user);
+
   const handleSignIn = async (e: GestureResponderEvent) => {
     e.preventDefault();
     // Handle sign
@@ -30,6 +34,7 @@ const SignIn = () => {
         return;
       }
       console.log("Success:", result);
+      setUser(result.user);
       router.push("/");
     } catch (error) {
       console.error("Error:", error);

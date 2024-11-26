@@ -5,6 +5,7 @@ import { useFonts } from "expo-font";
 import { LogBox } from "react-native";
 import { useEffect } from "react";
 import { ToastProvider } from "react-native-toast-notifications";
+import { UserProvider } from "@/context/UserContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -30,11 +31,13 @@ export default function RootLayout() {
     return null;
   }
   return (
-    <ToastProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-    </ToastProvider>
+    <UserProvider>
+      <ToastProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </ToastProvider>
+    </UserProvider>
   );
 }
