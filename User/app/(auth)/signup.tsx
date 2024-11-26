@@ -17,7 +17,6 @@ const SignUp = () => {
   const [message, setMessage] = useState("");
 
   const handleSignUp = async (e: GestureResponderEvent) => {
-    // Handle sign up logic here
     e.preventDefault();
 
     if (password !== confirmPassword) {

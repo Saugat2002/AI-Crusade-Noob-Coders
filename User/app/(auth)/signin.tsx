@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   GestureResponderEvent,
 } from "react-native";
-import Button from "../../components/Button";
 import { Link, router } from "expo-router";
 
 const SignIn = () => {
@@ -21,7 +20,7 @@ const SignIn = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
-      credentials: "include"
+      credentials: "include",
     });
     try {
       const response = await fetch(request);
@@ -31,7 +30,7 @@ const SignIn = () => {
         return;
       }
       console.log("Success:", result);
-      router.push("/home");
+      router.push("/");
     } catch (error) {
       console.error("Error:", error);
     }
