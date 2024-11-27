@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Link, useGlobalSearchParams } from "expo-router";
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function verifyEmail() {
   const [validUrl, setValidUrl] = useState(false);
