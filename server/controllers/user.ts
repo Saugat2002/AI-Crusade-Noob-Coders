@@ -90,13 +90,11 @@ export const handleSignIn = async (
     }
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET_KEY!);
     res.cookie("token", token, { httpOnly: true });
-    res
-      .status(200)
-      .json({
-        status: 200,
-        message: "User signed in successfully",
-        user: { email: user.email, fullName: user.fullName },
-      });
+    res.status(200).json({
+      status: 200,
+      message: "User signed in successfully",
+      user: { email: user.email, fullName: user.fullName },
+    });
   });
 };
 
@@ -135,4 +133,11 @@ export const handleVerifyEmail = async (
     console.error("Error verifying email:");
     res.status(500).json({ status: 500, message: "Internal server error" });
   }
+};
+
+export const handleSignOut = async (req: Request, res: Response) => {
+  res.clearCookie("token");
+  res
+    .status(200)
+    .json({ status: 200, message: "User signed out successfully" });
 };

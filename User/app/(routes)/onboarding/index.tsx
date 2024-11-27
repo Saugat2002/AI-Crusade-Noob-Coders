@@ -10,7 +10,7 @@ export default function index() {
           Welcome to
         </Text>
         <Text className="text-3xl font-bold text-blue-800 text-center">
-          Career Connect
+          Dementia Care
         </Text>
       </View>
       <Button

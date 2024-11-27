@@ -1,4 +1,11 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+} from "react";
+import {router} from "expo-router";
 
 interface User {
   fullName: string;
@@ -29,8 +36,24 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user]);
 
-  const signOut = () => {
-    setUser(null);
+  const signOut = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/v1/signout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      if (response.status === 200) {
+        setUser(null);
+        router.push('/signin');
+      } else {
+        console.error("Failed to sign out");
+      }
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (

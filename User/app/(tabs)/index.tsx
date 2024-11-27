@@ -20,8 +20,8 @@ export default function Index() {
         });
         const result = await response.json();
         if (response.status !== 200) {
-          alert(result.message);
-          router.push("/signin");
+          console.log(result);
+          router.push("/onboarding");
           return;
         }
         setIsLoggedIn(true);

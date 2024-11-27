@@ -84,7 +84,6 @@ export default function Profile() {
       <TouchableOpacity style={{...styles.editButton, backgroundColor: "red"}}
         onPress={() => {
           signOut();
-          router.push("/signin");
         }}
       >
         <MaterialIcons name="exit-to-app" size={20} color="white" />

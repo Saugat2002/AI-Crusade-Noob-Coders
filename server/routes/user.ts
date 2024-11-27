@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import { handleRegister, handleSignIn, handleVerifyEmail} from "../controllers/user";
+import { handleRegister, handleSignIn, handleVerifyEmail, handleSignOut} from "../controllers/user";
 import jwt from "jsonwebtoken";
 
 const userRouter = express.Router();
@@ -9,6 +9,8 @@ userRouter.post("/register", handleRegister);
 userRouter.post("/signin", handleSignIn);
 
 userRouter.get("/verify-email", handleVerifyEmail);
+
+userRouter.post("/signout", handleSignOut);
 
 const verifyUser = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.token;
