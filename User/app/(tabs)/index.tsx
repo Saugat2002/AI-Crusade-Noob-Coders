@@ -11,7 +11,8 @@ import { MaterialIcons } from "@expo/vector-icons"; // Make sure to install expo
 
 export default function Index() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  useEffect(() => {
+  
+  useEffect(() => { 
     const fetchData = async () => {
       try {
         const response = await fetch("http://localhost:8000/api/v1/home", {
@@ -24,7 +25,6 @@ export default function Index() {
           return;
         }
         setIsLoggedIn(true);
-        console.log(result);
       } catch (err) {
         console.log(err);
         router.push("/onboarding");

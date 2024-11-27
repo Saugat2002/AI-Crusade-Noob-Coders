@@ -12,8 +12,7 @@ import { useUser } from "@/context/UserContext";
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { user, setUser } = useUser();
-  // console.log(user);
+  const { setUser } = useUser();
 
   const handleSignIn = async (e: GestureResponderEvent) => {
     e.preventDefault();
