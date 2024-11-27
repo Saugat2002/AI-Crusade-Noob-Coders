@@ -11,8 +11,8 @@ import { MaterialIcons } from "@expo/vector-icons"; // Make sure to install expo
 
 export default function Index() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
-  useEffect(() => { 
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch("http://localhost:8000/api/v1/home", {
@@ -47,6 +47,7 @@ export default function Index() {
       | "psychology"
       | "people";
     description: string;
+    route: string;
   };
 
   const features: Feature[] = [
@@ -54,31 +55,37 @@ export default function Index() {
       title: "Real-time Transcription",
       icon: "record-voice-over",
       description: "Convert speech to text instantly",
+      route: "/real-time-transcription",
     },
     {
       title: "Emotion Detection",
       icon: "mood",
       description: "Track mood changes and emotional well-being",
+      route: "/emotion-detection",
     },
     {
       title: "Conversation Bookmark",
       icon: "bookmark",
       description: "Save and revisit meaningful conversations",
+      route: "/conversation-bookmark",
     },
     {
       title: "Daily Tasks",
       icon: "checklist",
       description: "AI-generated to-do lists and reminders",
+      route: "/daily-tasks",
     },
     {
       title: "Cognitive Exercises",
       icon: "psychology",
       description: "Brain games for mental stimulation",
+      route: "/cognitive-exercises",
     },
     {
       title: "Progress Sharing",
       icon: "people",
       description: "Keep family updated on condition",
+      route: "/progress-sharing",
     },
   ];
 
@@ -93,7 +100,13 @@ export default function Index() {
 
       <View style={styles.featuresGrid}>
         {features.map((feature, index) => (
-          <TouchableOpacity key={index} style={styles.featureCard}>
+          <TouchableOpacity
+            key={index}
+            style={styles.featureCard}
+            onPress={() => {
+              router.push(feature.route as any);
+            }}
+          >
             <MaterialIcons name={feature.icon} size={32} color="#4A90E2" />
             <Text style={styles.featureTitle}>{feature.title}</Text>
             <Text style={styles.featureDescription}>{feature.description}</Text>
