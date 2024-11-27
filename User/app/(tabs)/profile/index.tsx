@@ -19,42 +19,54 @@ export default function Profile() {
     icon: "person" | "settings" | "trending-up";
     data: { label: string; value: string | undefined }[];
   }[] = [
-    {
-      title: "Personal Information",
-      icon: "person",
-      data: [
-        { label: "Full Name", value: user?.fullName },
-        { label: "Email", value: user?.email },
-      ],
-    },
-    {
-      title: "Care Settings",
-      icon: "settings",
-      data: [
-        { label: "Language", value: "English" },
-        { label: "Notifications", value: "Enabled" },
-      ],
-    },
-    {
-      title: "Progress Overview",
-      icon: "trending-up",
-      data: [
-        { label: "Daily Tasks Completed", value: "8/10" },
-        { label: "Weekly Exercise Score", value: "85%" },
-      ],
-    },
-  ];
+      {
+        title: "Personal Information",
+        icon: "person",
+        data: [
+          { label: "Full Name", value: user?.fullName },
+          { label: "Email", value: user?.email },
+        ],
+      },
+      {
+        title: "Care Settings",
+        icon: "settings",
+        data: [
+          { label: "Language", value: "English" },
+          { label: "Notifications", value: "Enabled" },
+        ],
+      },
+      {
+        title: "Progress Overview",
+        icon: "trending-up",
+        data: [
+          { label: "Daily Tasks Completed", value: "8/10" },
+          { label: "Weekly Exercise Score", value: "85%" },
+        ],
+      },
+    ];
+
+    const InitialAvatar = ({ name, size = 120 }) => {
+      const initial = name ? name.charAt(0).toUpperCase() : '?';
+      
+      return (
+        <View style={[styles.initialAvatar, { width: size, height: size, borderRadius: size / 2 }]}>
+          <Text style={styles.initialText}>{initial}</Text>
+        </View>
+      );
+    };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.profileImageContainer}>
-          <Image
-            source={{
-              uri: user?.photoURL || "https://via.placeholder.com/150",
-            }}
-            style={styles.profileImage}
-          />
+        {user?.photoURL ? (
+            <Image
+              source={{ uri: user.photoURL }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <InitialAvatar name={user?.fullName} />
+          )}
         </View>
         <Text style={styles.userName}>{user?.fullName}</Text>
         <Text style={styles.userEmail}>{user?.email}</Text>
@@ -81,14 +93,14 @@ export default function Profile() {
         <Text style={styles.editButtonText}>Edit Profile</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={{...styles.editButton, backgroundColor: "red"}}
+      <TouchableOpacity style={{ ...styles.editButton, backgroundColor: "red" }}
         onPress={() => {
           signOut();
         }}
       >
         <MaterialIcons name="exit-to-app" size={20} color="white" />
         <Text style={styles.editButtonText}>Sign Out</Text>
-      </TouchableOpacity> 
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -120,11 +132,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    justifyContent: 'center',     
+    alignItems: 'center',         
+    overflow: 'hidden', 
   },
   profileImage: {
     width: "100%",
     height: "100%",
     borderRadius: 60,
+    resizeMode: 'cover',
   },
   userName: {
     fontSize: 24,
@@ -192,5 +208,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginLeft: 8,
+  },
+  initialAvatar: {
+    backgroundColor: '#E1E8FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+  },
+  initialText: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#4A90E2',
   },
 });
