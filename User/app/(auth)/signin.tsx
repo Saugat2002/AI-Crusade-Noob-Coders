@@ -17,7 +17,7 @@ const SignIn = () => {
   const handleSignIn = async (e: GestureResponderEvent) => {
     e.preventDefault();
     // Handle sign
-    const request = new Request("http://localhost:8000/api/v1/signin", {
+    const request = new Request(`${process.env.EXPO_PUBLIC_SERVER_URI}/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

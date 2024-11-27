@@ -5,7 +5,8 @@ import React, {
   useContext,
   ReactNode,
 } from "react";
-import {router} from "expo-router";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface User {
   fullName: string;
@@ -23,23 +24,56 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
+    const loadUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem("user");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        } else {
+          const response = await fetch(
+            `${process.env.EXPO_PUBLIC_SERVER_URI}/user-info`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+          if (response.status === 200) {
+            const result = await response.json();
+            setUser(result.user);
+            await AsyncStorage.setItem("user", JSON.stringify(result.user));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load user from AsyncStorage:", error);
+      }
+    };
+
+    loadUser();
+  }, []);
+
+  useEffect(() => {
+    const saveUser = async () => {
+      try {
+        if (user) {
+          await AsyncStorage.setItem("user", JSON.stringify(user));
+        } else {
+          await AsyncStorage.removeItem("user");
+        }
+      } catch (error) {
+        console.error("Failed to save user to AsyncStorage:", error);
+      }
+    };
+
+    saveUser();
   }, [user]);
 
   const signOut = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/signout`,
+        `${process.env.EXPO_PUBLIC_SERVER_URI}/signout`,
         {
           method: "POST",
           credentials: "include",
@@ -47,7 +81,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       );
       if (response.status === 200) {
         setUser(null);
-        router.push('/signin');
+        await AsyncStorage.removeItem("user");
+        router.push("/signin");
       } else {
         console.error("Failed to sign out");
       }

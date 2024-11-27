@@ -104,7 +104,8 @@ export default function Profile() {
         <Text style={styles.editButtonText}>Edit Profile</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+
+      {user ? (      <TouchableOpacity
         style={{ ...styles.editButton, backgroundColor: "red" }}
         onPress={() => {
           signOut();
@@ -112,7 +113,17 @@ export default function Profile() {
       >
         <MaterialIcons name="exit-to-app" size={20} color="white" />
         <Text style={styles.editButtonText}>Sign Out</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>) : (
+        <TouchableOpacity
+          style={{ ...styles.editButton, backgroundColor: "green" }}
+          onPress={() => {
+            router.push("/signin");
+          }}
+        >
+          <MaterialIcons name="login" size={20} color="white" />
+          <Text style={styles.editButtonText}>Sign In</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }

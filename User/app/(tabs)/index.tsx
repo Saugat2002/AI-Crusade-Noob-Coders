@@ -15,9 +15,12 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/v1/home", {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_SERVER_URI}/home`,
+          {
+            credentials: "include",
+          }
+        );
         const result = await response.json();
         if (response.status !== 200) {
           console.log(result);
@@ -30,6 +33,8 @@ export default function Index() {
         router.push("/onboarding");
       }
     };
+    console.log(isLoggedIn);
+
     fetchData();
   }, []);
 

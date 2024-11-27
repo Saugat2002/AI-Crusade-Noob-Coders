@@ -12,7 +12,7 @@ export default function verifyEmail() {
   useEffect(() => {
     const verifyEmailUrl = async () => {
       try {
-        const url = `http://localhost:8000/api/v1/verify-email?id=${queryParams.id}&token=${queryParams.token}`;
+        const url = `${process.env.EXPO_PUBLIC_SERVER_URI}/verify-email?id=${queryParams.id}&token=${queryParams.token}`;
         const response = await fetch(url);
         const result = await response.json();
         console.log(result);

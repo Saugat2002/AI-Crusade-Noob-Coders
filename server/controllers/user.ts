@@ -123,8 +123,8 @@ export const handleVerifyEmail = async (
       { _id: user._id },
       { verified: true }
     );
-    console.log(user);
-    console.log(updatedUser);
+    // console.log(user);
+    // console.log(updatedUser);
     await Token.deleteOne({ userId: user._id });
     res
       .status(200)

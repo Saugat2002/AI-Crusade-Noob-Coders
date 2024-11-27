@@ -24,7 +24,7 @@ const SignUp = () => {
       return;
     }
 
-    const request = new Request("http://localhost:8000/api/v1/register", {
+    const request = new Request(`${process.env.EXPO_PUBLIC_SERVER_URI}/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
