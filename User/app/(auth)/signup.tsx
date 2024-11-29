@@ -22,16 +22,17 @@ const SignUp = () => {
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
-    }
+    }    
 
-    const request = new Request(`${process.env.EXPO_PUBLIC_SERVER_URI}/signup`, {
+    const request = new Request(`${process.env.EXPO_PUBLIC_SERVER_URI}/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ fullName, email, password }),
-      credentials: "include"
+      credentials: "include",
     });
+    
     try {
       const response = await fetch(request);
       const result = await response.json();
@@ -44,7 +45,7 @@ const SignUp = () => {
     } catch (error) {
       console.error("Error:", error);
     }
-  };
+  };  
 
   return (
     <View style={styles.container}>

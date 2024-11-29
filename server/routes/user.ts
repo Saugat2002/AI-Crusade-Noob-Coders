@@ -23,7 +23,7 @@ userRouter.post("/signout", handleSignOut);
 
 const verifyUser = (req: CustomRequest, res: Response, next: NextFunction) => {
   const token = req.cookies.token;
-  console.log(token);
+  // console.log(token);
   if (!token) {
     console.log("Token Not Available");
     res
