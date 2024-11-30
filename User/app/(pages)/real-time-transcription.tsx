@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
-import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
+import { View, Text, Button, StyleSheet, Alert } from "react-native";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+import axios from "axios";
 
 export default function RealTimeTranscription() {
   const [transcript, setTranscript] = useState<string>("");
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
 
-  const fileName = `recording-${Date.now()}.mp3`;
-  const destination = `${FileSystem.documentDirectory}${fileName}`;
-
+  // Backend API URL - replace with your actual backend URL
+  const API_URL = "http://192.168.10.170:9000";
 
   useEffect(() => {
+    console.log(transcript);
+
     // Request audio permissions
-    Audio.requestPermissionsAsync().then(({ granted }) => {
+    (async () => {
+      const { granted } = await Audio.requestPermissionsAsync();
       if (!granted) setError("Audio permission not granted");
-    });
+    })();
 
     return () => {
       // Cleanup
@@ -28,7 +30,7 @@ export default function RealTimeTranscription() {
         sound.unloadAsync();
       }
     };
-  }, []);
+  }, [transcript]);
 
   const startRecording = async () => {
     try {
@@ -45,8 +47,9 @@ export default function RealTimeTranscription() {
 
       setRecording(recording);
       setIsRecording(true);
+      setTranscript(""); // Clear previous transcript
     } catch (err) {
-      setError('Failed to start recording: ' + err);
+      setError("Failed to start recording: " + err);
     }
   };
 
@@ -69,61 +72,64 @@ export default function RealTimeTranscription() {
         });
 
         setRecordingUri(destination);
-        console.log('Recording saved at:', destination);
+        setIsRecording(false);
+
+        // Send audio to backend for transcription
+        await transcribeAudio(destination);
+        await generateTodo();
       }
 
       setRecording(null);
-      setIsRecording(false);
     } catch (err) {
-      setError('Failed to stop recording: ' + err);
+      setError("Failed to stop recording: " + err);
     }
   };
 
-  const playRecording = async () => {
+  const transcribeAudio = async (audioUri: string) => {
     try {
-      if (!recordingUri) return;
+      // Create form data to send audio file
+      const formData = new FormData();
+      formData.append("file", {
+        uri: audioUri,
+        type: "audio/mp3",
+        name: `recording-${Date.now()}.mp3`,
+      } as any);
 
-      // Configure audio mode for playback
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-        shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: false,
+      console.log("Sending to URL:", API_URL);
+      // Send to backend
+      const response = await axios.post(`${API_URL}/transcribe`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      if (sound) {
-        await sound.unloadAsync();
-      }
+      // console.log("Response:", response.data);
+      setTranscript(response.data.transcript);
+    } catch (err) {
+      console.error("Transcription error:", err);
+      Alert.alert("Transcription Failed", "Unable to transcribe audio");
+    }
+  };
 
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: recordingUri },
-        { shouldPlay: true }
-      );
-
-      setSound(newSound);
-      setIsPlaying(true);
-
-      // Listen for playback status
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status && status.didJustFinish) {
-          setIsPlaying(false);
+  const generateTodo = async () => {
+    try {
+      if (!transcript){
+        console.log("No transcript to generate todos");
+        return
+      };
+      const response = await axios.post(
+        `${API_URL}/generate-todos`,
+        transcript,
+        {
+          headers: {
+            "Content-Type": "text/plain",
+          },
         }
-      });
-
-      await newSound.playAsync();
+      );
+      console.log("Result:", response);
     } catch (err) {
-      setError('Failed to play recording: ' + err);
-    }
-  };
-
-  const stopPlaying = async () => {
-    try {
-      if (sound) {
-        await sound.stopAsync();
-        setIsPlaying(false);
-      }
-    } catch (err) {
-      setError('Failed to stop playing: ' + err);
+      console.error("Todo generation error:", err);
+      // Alert.alert("Todo Generation Failed", "Unable to generate todo");
     }
   };
 
@@ -131,19 +137,15 @@ export default function RealTimeTranscription() {
     <View style={styles.container}>
       <Text style={styles.title}>Real-Time Transcription</Text>
       <View style={styles.transcriptionContainer}>
-        <Text style={styles.transcriptionText}>{transcript}</Text>
+        <Text style={styles.transcriptionText}>
+          {transcript || "Transcription will appear here"}
+        </Text>
       </View>
       {error && <Text style={styles.errorText}>Error: {error}</Text>}
       <Button
         title={isRecording ? "Stop Recording" : "Start Recording"}
         onPress={isRecording ? stopRecording : startRecording}
       />
-      {recordingUri && (
-        <Button
-          title={isPlaying ? "Stop Playing" : "Play Recording"}
-          onPress={isPlaying ? stopPlaying : playRecording}
-        />
-      )}
     </View>
   );
 }

@@ -14,7 +14,7 @@ app = FastAPI(title="Audio Processing API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174", "http://localhost:3000","http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -162,6 +162,7 @@ async def generate_todos(text: str):
         JSONResponse with structured todo list in English and Nepali
     """
     try:
+        print("Test", text)
         todo_list = generate_todo_list(text)
         return JSONResponse(content=todo_list)
     
@@ -183,6 +184,7 @@ async def analyze_sentiment(text: str):
         JSONResponse with sentiment analysis results
     """
     try:
+        print("Test")
         sentiment_result = perform_sentiment_analysis(text)
         return JSONResponse(content=sentiment_result)
     
@@ -200,4 +202,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=9000)
