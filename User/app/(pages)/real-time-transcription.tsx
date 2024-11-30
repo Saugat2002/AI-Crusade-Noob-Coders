@@ -6,14 +6,24 @@ import * as FileSystem from 'expo-file-system';
 export default function RealTimeTranscription() {
   const [transcript, setTranscript] = useState<string>("");
   const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [recordingUri, setRecordingUri] = useState<string | null>(null);
 
   useEffect(() => {
     // Request audio permissions
     Audio.requestPermissionsAsync().then(({ granted }) => {
       if (!granted) setError("Audio permission not granted");
     });
+
+    return () => {
+      // Cleanup
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
   }, []);
 
   const startRecording = async () => {
@@ -54,6 +64,7 @@ export default function RealTimeTranscription() {
           to: destination,
         });
 
+        setRecordingUri(destination);
         console.log('Recording saved at:', destination);
       }
 
@@ -61,6 +72,54 @@ export default function RealTimeTranscription() {
       setIsRecording(false);
     } catch (err) {
       setError('Failed to stop recording: ' + err);
+    }
+  };
+
+  const playRecording = async () => {
+    try {
+      if (!recordingUri) return;
+
+      // Configure audio mode for playback
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+
+      if (sound) {
+        await sound.unloadAsync();
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: recordingUri },
+        { shouldPlay: true }
+      );
+      
+      setSound(newSound);
+      setIsPlaying(true);
+
+      // Listen for playback status
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status && status.didJustFinish) {
+          setIsPlaying(false);
+        }
+      });
+
+      await newSound.playAsync();
+    } catch (err) {
+      setError('Failed to play recording: ' + err);
+    }
+  };
+
+  const stopPlaying = async () => {
+    try {
+      if (sound) {
+        await sound.stopAsync();
+        setIsPlaying(false);
+      }
+    } catch (err) {
+      setError('Failed to stop playing: ' + err);
     }
   };
 
@@ -75,10 +134,15 @@ export default function RealTimeTranscription() {
         title={isRecording ? "Stop Recording" : "Start Recording"}
         onPress={isRecording ? stopRecording : startRecording}
       />
+      {recordingUri && (
+        <Button
+          title={isPlaying ? "Stop Playing" : "Play Recording"}
+          onPress={isPlaying ? stopPlaying : playRecording}
+        />
+      )}
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
