@@ -73,7 +73,7 @@ export default function ProgressSharing() {
             setCurrentRiddle(riddle);
             setQuestionsAsked([...questionsAsked, riddle.id]);
         } else {
-            Alert.alert("क्विज समाप्त!", `तपाईंको स्कोर: ${score} / ${riddles.length}`);
+            Alert.alert("क्विज समाप्त!", `तपाईंको स्कोर: ${score}`);
             resetGame();
         }
     };
@@ -147,8 +147,8 @@ export default function ProgressSharing() {
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Game Over!</Text>
                         <Text style={styles.modalScore}>Your Score: {score} / {riddles.length}</Text>
-                        <TouchableOpacity 
-                            style={styles.playAgainButton} 
+                        <TouchableOpacity
+                            style={styles.playAgainButton}
                             onPress={resetGame}
                         >
                             <Text style={styles.playAgainText}>Play Again</Text>
