@@ -1,11 +1,13 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Link, useGlobalSearchParams } from "expo-router";
-import { MaterialIcons } from '@expo/vector-icons';
+import { useLanguage } from "@/context/LanguageContext"; // Adjust the import as needed
+import texts from "@/utils/texts";
 
 export default function verifyEmail() {
   const [validUrl, setValidUrl] = useState(false);
   const queryParams = useGlobalSearchParams();
+  const { language, setLanguage } = useLanguage(); // Adjust the import as needed
 
   console.log("Query Params", queryParams);
 
@@ -33,8 +35,15 @@ export default function verifyEmail() {
     <View>
       {validUrl ? (
         <View>
-          <Text>Email verified successfully</Text>
-          <Link href="/signin">Go To Login</Link>
+          <Text>{texts[language].emailVerified}</Text>
+          <Link href="/signin">{texts[language].signIn}</Link>
+          <TouchableOpacity
+          onPress={() => {
+            setLanguage(language === "english" ? "nepali" : "english");
+          }}
+        >
+          <Text>{texts[language].switch}</Text>
+        </TouchableOpacity>
         </View>
       ) : (
         <Text>404 not Found</Text>
