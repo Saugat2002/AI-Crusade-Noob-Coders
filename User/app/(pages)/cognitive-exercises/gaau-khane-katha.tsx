@@ -146,7 +146,7 @@ export default function ProgressSharing() {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Game Over!</Text>
-                        <Text style={styles.modalScore}>Your Score: {score} / {riddles.length}</Text>
+                        <Text style={styles.modalScore}>Your Score: {score}</Text>
                         <TouchableOpacity
                             style={styles.playAgainButton}
                             onPress={resetGame}
