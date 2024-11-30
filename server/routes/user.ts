@@ -5,7 +5,13 @@ import {
   handleVerifyEmail,
   handleSignOut,
 } from "../controllers/user";
+import {
+  handleAddTask,
+  handleDeleteTask,
+  handleUpdateTask,
+} from "../controllers/task";
 import jwt from "jsonwebtoken";
+import Task from "../models/task";
 
 interface CustomRequest extends Request {
   user?: any; // Adjust the type as needed
@@ -20,6 +26,22 @@ userRouter.post("/signin", handleSignIn);
 userRouter.get("/verify-email", handleVerifyEmail);
 
 userRouter.post("/signout", handleSignOut);
+
+userRouter.post("/addTask", handleAddTask);
+
+userRouter.post("/deleteTask", handleDeleteTask);
+
+userRouter.post("/updateTask", handleUpdateTask);
+
+userRouter.get("/fetchTasks", async (req: Request, res: Response) => {
+  try {
+    const tasks = await Task.find({});
+    res.status(200).json({ status: 200, tasks });
+  } catch (err) {
+    console.error("Error fetching tasks:", err);
+    res.status(500).json({ status: 500, message: "Internal server error" });
+  }
+});
 
 const verifyUser = (req: CustomRequest, res: Response, next: NextFunction) => {
   const token = req.cookies.token;

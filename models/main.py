@@ -6,9 +6,17 @@ import os
 from dotenv import load_dotenv
 from typing import Dict, List
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import logging
+
 
 # Load environment variables from .env file
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.DEBUG,  # Set the logging level
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Format for log messages
+)
 
 app = FastAPI(title="Audio Processing API")
 
@@ -19,6 +27,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class TodoRequest(BaseModel):
+    text: str
 
 # Initialize OpenAI client using environment variable
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -151,7 +162,7 @@ async def transcribe_audio(file: UploadFile = File(...), language: str = "ne"):
         )
 
 @app.post("/generate-todos")
-async def generate_todos(text: str):
+async def generate_todos(request: TodoRequest):
     """
     Generate bilingual todo list from text.
     
@@ -162,9 +173,11 @@ async def generate_todos(text: str):
         JSONResponse with structured todo list in English and Nepali
     """
     try:
-        print("Test", text)
+        # print("Test", text)
+        text = request.text
+        logging.info("INFO: Handling a request to the root endpoint")
         todo_list = generate_todo_list(text)
-        return JSONResponse(content=todo_list)
+        return JSONResponse(content=todo_list, status_code=200)
     
     except Exception as e:
         return JSONResponse(
@@ -184,7 +197,6 @@ async def analyze_sentiment(text: str):
         JSONResponse with sentiment analysis results
     """
     try:
-        print("Test")
         sentiment_result = perform_sentiment_analysis(text)
         return JSONResponse(content=sentiment_result)
     
