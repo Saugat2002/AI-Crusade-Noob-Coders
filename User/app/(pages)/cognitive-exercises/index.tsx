@@ -26,9 +26,9 @@ export default function ProgressSharing() {
         },
         {
             id: 3,
-            title: "Reaction Time Challenge",
-            description: "Test and improve your reaction speed",
-            route: "/cognitive-exercises/reaction-time",
+            title: "Sudoku",
+            description: "Play with numbers",
+            route: "/cognitive-exercises/sudoku",
             icon: HeartPulseIcon
         }
     ];
