@@ -1,12 +1,22 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, StatusBar } from 'react-native';
 import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  FlatList, 
+  StatusBar, 
+  Modal, 
+  TextInput 
+} from 'react-native';
 
 export default function DailyTasks() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskTime, setNewTaskTime] = useState('12:00 PM');
+  const [editingTask, setEditingTask] = useState(null);
   const [tasks, setTasks] = useState([
-    // Example tasks - in real implementation these would come from voice input
     { id: '1', title: 'Morning Medicine', time: '8:00 AM', completed: false },
     { id: '2', title: 'Memory Exercise', time: '10:00 AM', completed: false },
   ]);
@@ -25,6 +35,28 @@ export default function DailyTasks() {
     setModalVisible(false);
     setNewTaskTitle('');
     setNewTaskTime('12:00 PM');
+  };
+
+  const handleEditTask = () => {
+    if (!editingTask || newTaskTitle.trim() === '') return;
+
+    setTasks(tasks.map(task => 
+      task.id === editingTask.id 
+        ? { ...task, title: newTaskTitle, time: newTaskTime }
+        : task
+    ));
+
+    setEditModalVisible(false);
+    setNewTaskTitle('');
+    setNewTaskTime('12:00 PM');
+    setEditingTask(null);
+  };
+
+  const openEditModal = (task) => {
+    setEditingTask(task);
+    setNewTaskTitle(task.title);
+    setNewTaskTime(task.time);
+    setEditModalVisible(true);
   };
 
   const toggleTask = (taskId) => {
@@ -58,6 +90,12 @@ export default function DailyTasks() {
 
       <View style={styles.actionButtons}>
         <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => openEditModal(item)}
+        >
+          <Text style={styles.editButtonText}>✎</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[
             styles.checkbox,
             item.completed && styles.checkboxChecked
@@ -80,19 +118,11 @@ export default function DailyTasks() {
       <Text style={styles.header}>Daily Tasks</Text>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => {
-          // Add a new task with default values
-          const newTask = {
-            id: Date.now().toString(),
-            title: 'New Task',
-            time: '12:00 PM',
-            completed: false
-          };
-          setTasks([...tasks, newTask]);
-        }}
+        onPress={() => setModalVisible(true)}
       >
         <Text style={styles.addButtonText}>+ Add New Task</Text>
       </TouchableOpacity>
+      
       <FlatList
         data={tasks}
         renderItem={({ item }) => <TaskItem item={item} />}
@@ -100,11 +130,118 @@ export default function DailyTasks() {
         showsVerticalScrollIndicator={false}
         style={styles.list}
       />
+
+      {/* Add Task Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Add New Task</Text>
+            
+            <TextInput
+              style={styles.input}
+              placeholder="Enter task title"
+              value={newTaskTitle}
+              onChangeText={setNewTaskTitle}
+            />
+            
+            <TextInput
+              style={styles.input}
+              placeholder="Enter time (e.g., 12:00 PM)"
+              value={newTaskTime}
+              onChangeText={setNewTaskTime}
+            />
+            
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalCancelButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalCancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.modalAddButton}
+                onPress={handleAddTask}
+              >
+                <Text style={styles.modalAddButtonText}>Add Task</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Edit Task Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={editModalVisible}
+        onRequestClose={() => setEditModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Task</Text>
+            
+            <TextInput
+              style={styles.input}
+              placeholder="Enter task title"
+              value={newTaskTitle}
+              onChangeText={setNewTaskTitle}
+            />
+            
+            <TextInput
+              style={styles.input}
+              placeholder="Enter time (e.g., 12:00 PM)"
+              value={newTaskTime}
+              onChangeText={setNewTaskTime}
+            />
+            
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalCancelButton}
+                onPress={() => setEditModalVisible(false)}
+              >
+                <Text style={styles.modalCancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.modalAddButton}
+                onPress={handleEditTask}
+              >
+                <Text style={styles.modalAddButtonText}>Save Changes</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  editButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#e6e6fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  editButtonText: {
+    color: '#6B4E71',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
@@ -194,6 +331,70 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#6B4E71',
+  },
+  input: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalCancelButton: {
+    flex: 1,
+    marginRight: 10,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: '#f0f0f0',
+  },
+  modalCancelButtonText: {
+    color: '#333',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  modalAddButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: '#6B4E71',
+  },
+  modalAddButtonText: {
+    color: 'white',
+    textAlign: 'center',
     fontWeight: '600',
   },
 });
