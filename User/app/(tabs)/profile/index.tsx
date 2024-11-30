@@ -10,6 +10,7 @@ import React from "react";
 import { useUser } from "@/context/UserContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { capitalizeFirstLetter } from "@/utils/capitalizeFirstletter";
 
 export default function Profile() {
   const { user, signOut } = useUser();
@@ -25,6 +26,8 @@ export default function Profile() {
       data: [
         { label: "Full Name", value: user?.fullName },
         { label: "Email", value: user?.email },
+        { label: 'Gender', value: capitalizeFirstLetter(user?.gender!) },
+        { label: "Guardian's Email", value: user?.guardiansEmail },
       ],
     },
     {

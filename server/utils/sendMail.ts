@@ -22,7 +22,7 @@ const sendMail = async (email: string, subject: string, text: string) => {
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        console.log("Test", error);
+        console.log("Email Sending Error: ", error);
       } else {
         console.log("Email sent successfully: " + info.response);
       }

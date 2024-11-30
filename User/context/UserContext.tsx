@@ -12,6 +12,8 @@ interface User {
   fullName: string;
   email: string;
   photoURL?: string;
+  gender: string;
+  guardiansEmail: string;
   // Add other user details as needed
 }
 

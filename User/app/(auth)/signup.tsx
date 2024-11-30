@@ -8,6 +8,7 @@ import {
   StyleSheet,
   GestureResponderEvent,
 } from "react-native";
+import { RadioButton } from "react-native-paper";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +16,8 @@ const SignUp = () => {
   const [fullName, setFullName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [gender, setGender] = useState("male");
+  const [guardiansEmail, setGuardiansEmail] = useState("");
 
   const handleSignUp = async (e: GestureResponderEvent) => {
     e.preventDefault();
@@ -22,30 +25,41 @@ const SignUp = () => {
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
-    }    
+    }
 
-    const request = new Request(`${process.env.EXPO_PUBLIC_SERVER_URI}/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ fullName, email, password }),
-      credentials: "include",
-    });
-    
+    const request = new Request(
+      `${process.env.EXPO_PUBLIC_SERVER_URI}/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+          gender,
+          guardiansEmail,
+        }),
+        credentials: "include",
+      }
+    );
+
     try {
       const response = await fetch(request);
+      console.log(response);
+      
       const result = await response.json();
       if (response.status !== 201) {
         alert(result.message);
         return;
       }
-      setMessage(result.message)
-
+      setMessage(result.message);
     } catch (error) {
       console.error("Error:", error);
+      setMessage("Registration failed. Please try again.");
     }
-  };  
+  };
 
   return (
     <View style={styles.container}>
@@ -76,6 +90,32 @@ const SignUp = () => {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
+      <View style={styles.radioContainer}>
+        <Text style={styles.radioLabel}>Gender:</Text>
+        <RadioButton.Group
+          onValueChange={(value: string) => setGender(value)}
+          value={gender}
+        >
+          <View style={styles.radioButton}>
+            <RadioButton value="male" />
+            <Text>Male</Text>
+          </View>
+          <View style={styles.radioButton}>
+            <RadioButton value="female" />
+            <Text>Female</Text>
+          </View>
+          <View style={styles.radioButton}>
+            <RadioButton value="other" />
+            <Text>Other</Text>
+          </View>
+        </RadioButton.Group>
+      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Guardian's Email"
+        value={guardiansEmail}
+        onChangeText={setGuardiansEmail}
+      />
       <Text>{message}</Text>
       <TouchableOpacity style={styles.button} onPress={(e) => handleSignUp(e)}>
         <Text style={styles.buttonText}>Sign Up</Text>
@@ -85,6 +125,19 @@ const SignUp = () => {
 };
 
 const styles = StyleSheet.create({
+  radioContainer: {
+    width: "100%",
+    marginBottom: 16,
+  },
+  radioLabel: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  radioButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
   container: {
     flex: 1,
     justifyContent: "center",

@@ -13,7 +13,9 @@ export const handleRegister = async (
   next: NextFunction
 ) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, gender, guardiansEmail } = req.body;
+    console.log(req.body);
+    
     bcrypt.hash(password, 10, async (err, hash) => {
       if (err) {
         res.status(500).json({ status: 500, message: "Internal server error" });
@@ -23,7 +25,11 @@ export const handleRegister = async (
         fullName,
         email,
         password: hash,
+        gender,
+        guardiansEmail,
       });
+      console.log(user);
+      
 
       const token = await Token.create({
         userId: user._id,
@@ -93,7 +99,7 @@ export const handleSignIn = async (
     res.status(200).json({
       status: 200,
       message: "User signed in successfully",
-      user: { email: user.email, fullName: user.fullName },
+      user: user,
     });
   });
 };
