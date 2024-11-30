@@ -8,9 +8,11 @@ import {
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons"; // Make sure to install expo icons
-
+import texts from "@/utils/texts";
+import { useLanguage } from "@/context/LanguageContext";
 export default function Index() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,39 +59,39 @@ export default function Index() {
 
   const features: Feature[] = [
     {
-      title: "Real-time Transcription",
+      title: texts[language].features.realTimeTranscription.title,
       icon: "record-voice-over",
-      description: "Convert speech to text instantly",
+      description: texts[language].features.realTimeTranscription.description,
       route: "/real-time-transcription",
     },
     {
-      title: "Emotion Detection",
+      title: texts[language].features.emotionDetection.title,
       icon: "mood",
-      description: "Track mood changes and emotional well-being",
+      description: texts[language].features.emotionDetection.description,
       route: "/emotion-detection",
     },
     {
-      title: "Conversation Bookmark",
+      title: texts[language].features.conversationBookmark.title,
       icon: "bookmark",
-      description: "Save and revisit meaningful conversations",
+      description: texts[language].features.conversationBookmark.description,
       route: "/conversation-bookmark",
     },
     {
-      title: "Daily Tasks",
+      title: texts[language].features.dailyTasks.title,
       icon: "checklist",
-      description: "AI-generated to-do lists and reminders",
+      description: texts[language].features.dailyTasks.description,
       route: "/daily-tasks",
     },
     {
-      title: "Cognitive Exercises",
+      title: texts[language].features.cognitiveExercises.title,
       icon: "psychology",
-      description: "Brain games for mental stimulation",
+      description: texts[language].features.cognitiveExercises.description,
       route: "/cognitive-exercises",
     },
     {
-      title: "Progress Sharing",
+      title: texts[language].features.progressSharing.title,
       icon: "people",
-      description: "Keep family updated on condition",
+      description: texts[language].features.progressSharing.description,
       route: "/progress-sharing",
     },
   ];

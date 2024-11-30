@@ -6,48 +6,18 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { capitalizeFirstLetter } from "@/utils/capitalizeFirstletter";
+import { useLanguage } from "@/context/LanguageContext";
+import RNPickerSelect from "react-native-picker-select";
+import texts from "@/utils/texts";
 
 export default function Profile() {
   const { user, signOut } = useUser();
-
-  const profileSections: {
-    title: string;
-    icon: "person" | "settings" | "trending-up";
-    data: { label: string; value: string | undefined }[];
-  }[] = [
-    {
-      title: "Personal Information",
-      icon: "person",
-      data: [
-        { label: "Full Name", value: user?.fullName },
-        { label: "Email", value: user?.email },
-        { label: 'Gender', value: capitalizeFirstLetter(user?.gender!) },
-        { label: "Guardian's Email", value: user?.guardiansEmail },
-      ],
-    },
-    {
-      title: "Care Settings",
-      icon: "settings",
-      data: [
-        { label: "Language", value: "English" },
-        { label: "Notifications", value: "Enabled" },
-      ],
-    },
-    {
-      title: "Progress Overview",
-      icon: "trending-up",
-      data: [
-        { label: "Daily Tasks Completed", value: "8/10" },
-        { label: "Weekly Exercise Score", value: "85%" },
-      ],
-    },
-  ];
-
+  const { language, setLanguage } = useLanguage();
   const InitialAvatar = ({
     name,
     size,
@@ -69,8 +39,11 @@ export default function Profile() {
     );
   };
 
+  console.log(language);
+
   return (
     <ScrollView style={styles.container}>
+      {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.profileImageContainer}>
           {user?.photoURL ? (
@@ -86,45 +59,105 @@ export default function Profile() {
         <Text style={styles.userEmail}>{user?.email}</Text>
       </View>
 
-      {profileSections.map((section, index) => (
-        <View key={index} style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name={section.icon} size={24} color="#4A90E2" />
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-          </View>
-
-          {section.data.map((item, idx) => (
-            <View key={idx} style={styles.infoRow}>
-              <Text style={styles.label}>{item.label}</Text>
-              <Text style={styles.value}>{item.value}</Text>
-            </View>
-          ))}
+      {/* Personal Information Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <MaterialIcons name="person" size={24} color="#4A90E2" />
+          <Text style={styles.sectionTitle}>
+            {texts[language].personalInformation}
+          </Text>
         </View>
-      ))}
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>{texts[language].fullName}</Text>
+          <Text style={styles.value}>{user?.fullName}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>{texts[language].email}</Text>
+          <Text style={styles.value}>{user?.email}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>{texts[language].gender}</Text>
+          <Text style={styles.value}>
+            {capitalizeFirstLetter(user?.gender || "")}
+          </Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>{texts[language].guardiansEmail}</Text>
+          <Text style={styles.value}>{user?.guardiansEmail}</Text>
+        </View>
+      </View>
 
-      <TouchableOpacity style={styles.editButton}>
+      {/* Care Settings Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <MaterialIcons name="settings" size={24} color="#4A90E2" />
+          <Text style={styles.sectionTitle}>{texts[language].languageSettings}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>{texts[language].language}</Text>
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <RNPickerSelect
+              onValueChange={(value) => setLanguage(value)}
+              items={[
+                { label: "English", value: "english" },
+                { label: "Nepali", value: "nepali" },
+              ]}
+              value={language}
+              placeholder={{ label: "Choose a language", value: language }}
+              style={{
+                inputAndroid: styles.pickerInput,
+              }}
+            />
+          </View>
+        </View>
+        {/* <View style={styles.infoRow}>
+          <Text style={styles.label}>Notifications</Text>
+          <Text style={styles.value}>Enabled</Text>
+        </View> */}
+      </View>
+
+      {/* Progress Overview Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <MaterialIcons name="trending-up" size={24} color="#4A90E2" />
+          <Text style={styles.sectionTitle}>
+            {texts[language].progressOverview}
+          </Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>
+            {texts[language].dailyTasksCompleted}
+          </Text>
+          <Text style={styles.value}>8/10</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>{texts[language].weeklyExerciseScore}</Text>
+          <Text style={styles.value}>85%</Text>
+        </View>
+      </View>
+
+      {/* Buttons */}
+      {/* <TouchableOpacity style={styles.editButton}>
         <MaterialIcons name="edit" size={20} color="white" />
         <Text style={styles.editButtonText}>Edit Profile</Text>
-      </TouchableOpacity>
-
-
-      {user ? (      <TouchableOpacity
-        style={{ ...styles.editButton, backgroundColor: "red" }}
-        onPress={() => {
-          signOut();
-        }}
-      >
-        <MaterialIcons name="exit-to-app" size={20} color="white" />
-        <Text style={styles.editButtonText}>Sign Out</Text>
-      </TouchableOpacity>) : (
+      </TouchableOpacity> */}
+      {user ? (
+        <TouchableOpacity
+          style={{ ...styles.editButton, backgroundColor: "red" }}
+          onPress={signOut}
+        >
+          <MaterialIcons name="exit-to-app" size={20} color="white" />
+          <Text style={styles.editButtonText}>{texts[language].signOut}</Text>
+        </TouchableOpacity>
+      ) : (
         <TouchableOpacity
           style={{ ...styles.editButton, backgroundColor: "green" }}
-          onPress={() => {
-            router.push("/signin");
-          }}
+          onPress={() => router.push("/signin")}
         >
           <MaterialIcons name="login" size={20} color="white" />
-          <Text style={styles.editButtonText}>Sign In</Text>
+          <Text style={styles.editButtonText}>{texts[language].signIn}</Text>
         </TouchableOpacity>
       )}
     </ScrollView>
@@ -151,10 +184,7 @@ const styles = StyleSheet.create({
     padding: 3,
     marginBottom: 15,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -184,10 +214,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 3,
@@ -206,6 +233,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#F0F0F0",
@@ -218,6 +246,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     fontWeight: "500",
+  },
+  picker: {
+    width: 150,
+    color: "#333",
   },
   editButton: {
     flexDirection: "row",
@@ -247,5 +279,16 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: "bold",
     color: "#4A90E2",
+  },
+  pickerInput: {
+    fontSize: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 4,
+    color: "black",
+    paddingLeft: 50,
+    width: "100%",
   },
 });

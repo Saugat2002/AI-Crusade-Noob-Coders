@@ -15,6 +15,47 @@ const texts = {
     guardiansEmail: "Guardian's Email",
     emailVerified: "Email verified successfully",
     goToLogin: "Go To Login",
+    profile: "Profile",
+    personalInformation: "Personal Information",
+    language: "Language",
+    chooseLanguage: "Choose a language",
+    notifications: "Notifications",
+    enabled: "Enabled",
+    progressOverview: "Progress Overview",
+    dailyTasksCompleted: "Daily Tasks Completed",
+    weeklyExerciseScore: "Weekly Exercise Score",
+    editProfile: "Edit Profile",
+    signOut: "Sign Out",
+    settings: "Settings",
+    languageSettings: "Language Settings",
+    welcomeMessage: "Welcome to Dementia Care",
+    subtitle: "Your AI-Powered Dementia Support Companion",
+    features: {
+      realTimeTranscription: {
+        title: "Real-time Transcription",
+        description: "Convert speech to text instantly",
+      },
+      emotionDetection: {
+        title: "Emotion Detection",
+        description: "Track mood changes and emotional well-being",
+      },
+      conversationBookmark: {
+        title: "Conversation Bookmark",
+        description: "Save and revisit meaningful conversations",
+      },
+      dailyTasks: {
+        title: "Daily Tasks",
+        description: "AI-generated to-do lists and reminders",
+      },
+      cognitiveExercises: {
+        title: "Cognitive Exercises",
+        description: "Brain games for mental stimulation",
+      },
+      progressSharing: {
+        title: "Progress Sharing",
+        description: "Keep family updated on condition",
+      },
+    },
   },
   nepali: {
     signIn: "साइन इन",
@@ -32,6 +73,47 @@ const texts = {
     guardiansEmail: "अभिभावकको इमेल",
     emailVerified: "इमेल सफलतापूर्वक प्रमाणित गरियो",
     goToLogin: "लगइनमा जानुहोस्",
+    profile: "प्रोफाइल",
+    personalInformation: "व्यक्तिगत जानकारी",
+    language: "भाषा",
+    chooseLanguage: "भाषा चयन गर्नुहोस्",
+    notifications: "सूचनाहरू",
+    enabled: "सक्षम",
+    progressOverview: "प्रगति अवलोकन",
+    dailyTasksCompleted: "दैनिक कार्यहरू",
+    weeklyExerciseScore: "साप्ताहिक व्यायाम स्कोर",
+    editProfile: "प्रोफाइल सम्पादन गर्नुहोस्",
+    signOut: "साइन आउट",
+    settings: "सेटिङ्गहरू",
+    languageSettings: "भाषा सेटिङ्ग",
+    welcomeMessage: "डिमेन्सिया केयरमा स्वागत छ",
+    subtitle: "तपाईंको एआई-संचालित डिमेन्सिया समर्थन साथी",
+    features: {
+      realTimeTranscription: {
+        title: "रियल-टाइम ट्रान्सक्रिप्सन",
+        description: "भाषणलाई तुरुन्तै पाठमा रूपान्तरण गर्नुहोस्",
+      },
+      emotionDetection: {
+        title: "भावनाको पहिचान",
+        description: "मुड परिवर्तनहरू र भावनात्मक स्थिति ट्र्याक गर्नुहोस्",
+      },
+      conversationBookmark: {
+        title: "वार्ता बुकमार्क",
+        description: "महत्वपूर्ण वार्ता सुरक्षित राख्नुहोस् र पुन: हेर्नुहोस्",
+      },
+      dailyTasks: {
+        title: "दैनिक कार्यहरू",
+        description: "एआई-जनित टु-डू सूचीहरू र रिमाइन्डरहरू",
+      },
+      cognitiveExercises: {
+        title: "संज्ञानात्मक अभ्यासहरू",
+        description: "मस्तिष्क खेलहरू मानसिक उत्तेजनाको लागि",
+      },
+      progressSharing: {
+        title: "प्रगति साझा गर्दै",
+        description: "परिवारलाई स्थिति अद्यावधिक गराउनुहोस्",
+      },
+    },
   },
 };
 
