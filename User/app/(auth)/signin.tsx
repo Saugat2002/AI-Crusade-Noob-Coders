@@ -8,23 +8,31 @@ import {
 } from "react-native";
 import { Link, router } from "expo-router";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext"; // Adjust the import as needed
+import texts from "@/utils/texts";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setUser } = useUser();
+  const { language, setLanguage } = useLanguage(); // Adjust the destructuring as needed
+  console.log(language);
+  
 
   const handleSignIn = async (e: GestureResponderEvent) => {
     e.preventDefault();
     // Handle sign
-    const request = new Request(`${process.env.EXPO_PUBLIC_SERVER_URI}/signin`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-      credentials: "include",
-    });
+    const request = new Request(
+      `${process.env.EXPO_PUBLIC_SERVER_URI}/signin`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
+      }
+    );
     try {
       const response = await fetch(request);
       const result = await response.json();
@@ -39,37 +47,48 @@ const SignIn = () => {
       console.error("Error:", error);
     }
   };
+
   return (
     <>
       <View className="flex-1 justify-center items-center bg-white">
-        <Text className="text-2xl font-bold mb-6">Sign In</Text>
+        <Text className="text-2xl font-bold mb-6">
+          {texts[language].signIn}
+        </Text>
         <TextInput
           className="border border-gray-300 rounded p-2 mb-4 w-80"
-          placeholder="Email"
+          placeholder={texts[language].email}
           keyboardType="email-address"
           onChangeText={setEmail}
+          value={email}
         />
         <TextInput
           className="border border-gray-300 rounded p-2 mb-6 w-80"
-          placeholder="Password"
+          placeholder={texts[language].password}
           secureTextEntry
           onChangeText={setPassword}
+          value={password}
         />
-        {/* <Link href="/" className="text-blue-700 mb-6">
-          <Text className="underline">Forgot Password?</Text>
-        </Link> */}
         <TouchableOpacity
           className="bg-blue-500 rounded p-2 w-80"
           onPress={(e) => handleSignIn(e)}
         >
-          <Text className="text-white text-center">Sign In</Text>
+          <Text className="text-white text-center">
+            {texts[language].signIn}
+          </Text>
         </TouchableOpacity>
         <View className="flex flex-row mt-4">
-          <Text>Don't have an account? </Text>
+          <Text>{texts[language].dontHaveAccount}</Text>
           <Link href="/signup" className="text-blue-700">
-            <Text className="underline">Sign Up</Text>
+            <Text className="underline">{texts[language].signUp}</Text>
           </Link>
         </View>
+        <TouchableOpacity
+          onPress={() => {
+            setLanguage(language === "english" ? "nepali" : "english");
+          }}
+        >
+          <Text>{texts[language].switch}</Text>
+        </TouchableOpacity>
       </View>
     </>
   );

@@ -9,6 +9,8 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import { RadioButton } from "react-native-paper";
+import { useLanguage } from "@/context/LanguageContext";
+import texts from "@/utils/texts";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +20,7 @@ const SignUp = () => {
   const [message, setMessage] = useState("");
   const [gender, setGender] = useState("male");
   const [guardiansEmail, setGuardiansEmail] = useState("");
+  const { language, setLanguage} = useLanguage();
 
   const handleSignUp = async (e: GestureResponderEvent) => {
     e.preventDefault();
@@ -48,7 +51,7 @@ const SignUp = () => {
     try {
       const response = await fetch(request);
       console.log(response);
-      
+
       const result = await response.json();
       if (response.status !== 201) {
         alert(result.message);
@@ -63,63 +66,71 @@ const SignUp = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.title}>{texts[language].signUp}</Text>
       <TextInput
         style={styles.input}
-        placeholder="Full Name"
+        placeholder={texts[language].fullName}
         value={fullName}
         onChangeText={setFullName}
       />
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder={texts[language].email}
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder={texts[language].password}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
       <TextInput
         style={styles.input}
-        placeholder="Confirm Password"
+        placeholder={texts[language].confirmPassword}
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
       <View style={styles.radioContainer}>
-        <Text style={styles.radioLabel}>Gender:</Text>
+        <Text style={styles.radioLabel}>{texts[language].gender}:</Text>
         <RadioButton.Group
           onValueChange={(value: string) => setGender(value)}
           value={gender}
         >
           <View style={styles.radioButton}>
             <RadioButton value="male" />
-            <Text>Male</Text>
+            <Text>{texts[language].male}</Text>
           </View>
           <View style={styles.radioButton}>
             <RadioButton value="female" />
-            <Text>Female</Text>
+            <Text>{texts[language].female}</Text>
           </View>
           <View style={styles.radioButton}>
             <RadioButton value="other" />
-            <Text>Other</Text>
+            <Text>{texts[language].other}</Text>
           </View>
         </RadioButton.Group>
       </View>
       <TextInput
         style={styles.input}
-        placeholder="Guardian's Email"
+        placeholder={texts[language].guardiansEmail}
         value={guardiansEmail}
         onChangeText={setGuardiansEmail}
       />
       <Text>{message}</Text>
       <TouchableOpacity style={styles.button} onPress={(e) => handleSignUp(e)}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text style={styles.buttonText}>{texts[language].signUp}</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+          onPress={() => {
+            setLanguage(language === "english" ? "nepali" : "english");
+          }}
+        >
+          <Text>{texts[language].switch}</Text>
+        </TouchableOpacity>
     </View>
   );
 };

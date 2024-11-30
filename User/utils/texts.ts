@@ -1,0 +1,38 @@
+const texts = {
+  english: {
+    signIn: "Sign In",
+    email: "Email",
+    password: "Password",
+    dontHaveAccount: "Don't have an account?",
+    signUp: "Sign Up",
+    switch: "Switch to Nepali",
+    fullName: "Full Name",
+    confirmPassword: "Confirm Password",
+    gender: "Gender",
+    male: "Male",
+    female: "Female",
+    other: "Other",
+    guardiansEmail: "Guardian's Email",
+    emailVerified: "Email verified successfully",
+    goToLogin: "Go To Login",
+  },
+  nepali: {
+    signIn: "साइन इन",
+    email: "इमेल",
+    password: "पासवर्ड",
+    dontHaveAccount: "खाता छैन?",
+    signUp: "साइन अप",
+    switch: "अंग्रेजीमा स्विच गर्नुहोस्",
+    fullName: "पूरा नाम",
+    confirmPassword: "पासवर्ड पुष्टि गर्नुहोस्",
+    gender: "लिङ्ग",
+    male: "पुरुष",
+    female: "महिला",
+    other: "अन्य",
+    guardiansEmail: "अभिभावकको इमेल",
+    emailVerified: "इमेल सफलतापूर्वक प्रमाणित गरियो",
+    goToLogin: "लगइनमा जानुहोस्",
+  },
+};
+
+export default texts;
