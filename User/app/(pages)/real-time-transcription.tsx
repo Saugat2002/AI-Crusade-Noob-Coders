@@ -12,6 +12,10 @@ export default function RealTimeTranscription() {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
 
+  const fileName = `recording-${Date.now()}.mp3`;
+  const destination = `${FileSystem.documentDirectory}${fileName}`;
+
+
   useEffect(() => {
     // Request audio permissions
     Audio.requestPermissionsAsync().then(({ granted }) => {
@@ -38,7 +42,7 @@ export default function RealTimeTranscription() {
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
-      
+
       setRecording(recording);
       setIsRecording(true);
     } catch (err) {
@@ -52,11 +56,11 @@ export default function RealTimeTranscription() {
 
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
-      
+
       if (uri) {
         // Create a unique filename
         const fileName = `recording-${Date.now()}.mp3`;
-        const destination = `${FileSystem.documentDirectory}${fileName}`;
+        const destination = `${FileSystem.cacheDirectory}${fileName}`;
 
         // Save the recording
         await FileSystem.moveAsync({
@@ -95,7 +99,7 @@ export default function RealTimeTranscription() {
         { uri: recordingUri },
         { shouldPlay: true }
       );
-      
+
       setSound(newSound);
       setIsPlaying(true);
 
