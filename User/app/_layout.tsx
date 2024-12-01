@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { ToastProvider } from "react-native-toast-notifications";
 import { UserProvider } from "@/context/UserContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { TranscriptionProvider } from "@/context/TranscriptionContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -34,12 +35,14 @@ export default function RootLayout() {
   return (
     <UserProvider>
       <LanguageProvider>
-        <ToastProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
-        </ToastProvider>
+        <TranscriptionProvider>
+          <ToastProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+          </ToastProvider>
+        </TranscriptionProvider>
       </LanguageProvider>
     </UserProvider>
   );

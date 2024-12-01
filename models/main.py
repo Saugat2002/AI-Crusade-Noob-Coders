@@ -186,7 +186,7 @@ async def generate_todos(request: TodoRequest):
         )
 
 @app.post("/sentiment-analysis")
-async def analyze_sentiment(text: str):
+async def analyze_sentiment(request: TodoRequest):
     """
     Perform sentiment analysis on text.
     
@@ -197,6 +197,7 @@ async def analyze_sentiment(text: str):
         JSONResponse with sentiment analysis results
     """
     try:
+        text = request.text
         sentiment_result = perform_sentiment_analysis(text)
         return JSONResponse(content=sentiment_result)
     

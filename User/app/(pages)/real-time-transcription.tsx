@@ -5,20 +5,23 @@ import * as FileSystem from "expo-file-system";
 import axios from "axios";
 import { useLanguage } from "@/context/LanguageContext";
 import { useUser } from "@/context/UserContext";
+import { useTranscription } from "@/context/TranscriptionContext";
 
 export default function RealTimeTranscription() {
   const { user } = useUser();
   const { language } = useLanguage();
+  const { addTranscription } = useTranscription();
   const [transcript, setTranscript] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
+
   const [todos, setTodos] = useState([]);
 
   // Backend API URL - replace with your actual backend URL
-  const API_URL = "http://172.17.16.165:9000";
+  const API_URL = process.env.EXPO_PUBLIC_API_URI;
 
   useEffect(() => {
     // Request audio permissions
@@ -127,7 +130,10 @@ export default function RealTimeTranscription() {
         // Send audio to backend for transcription
         const result = await transcribeAudio(destination);
         console.log("Result", result);
-        changeTranscript(result);
+        if (result) {
+          changeTranscript(result);
+          addTranscription(result);
+        }
         const todos = await generateTodo(result);
         console.log("Todos:", todos);
         let newTodos;
