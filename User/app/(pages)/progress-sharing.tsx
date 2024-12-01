@@ -80,7 +80,7 @@ export default function ProgressSharing() {
   };
 
   // Helper function to convert time to minutes
-  const timeToMinutes = (timeString) => {
+  const timeToMinutes = (timeString : any) => {
     const [minutes, seconds] = timeString.split(":").map(Number);
     return parseFloat((minutes + seconds / 60).toFixed(1));
   };

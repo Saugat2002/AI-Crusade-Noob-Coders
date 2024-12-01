@@ -14,6 +14,7 @@ import axios from "axios";
 import { useLanguage } from "@/context/LanguageContext";
 import { useUser } from "@/context/UserContext";
 import { useTranscription } from "@/context/TranscriptionContext";
+import texts from "@/utils/texts";
 
 export default function RealTimeTranscription() {
   const { user } = useUser();
@@ -194,18 +195,20 @@ export default function RealTimeTranscription() {
     }
   };
 
+  
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Real-Time Transcription</Text>
+      <Text style={styles.title}>{texts[language].realTimeTranscription}</Text>
       <View style={styles.transcriptionContainer}>
         <Text style={styles.transcriptionText}>
-          {transcript || "Transcription will appear here"}
+          {transcript || texts[language].transcriptionPlaceholder}
         </Text>
       </View>
       <View className="flex flex-row h-10 mx-16 gap-7 justify-between items-start">
         <TextInput
           style={styles.input}
-          placeholder="Type here..."
+          placeholder={texts[language].typeHere}
           onChangeText={(text) => setTranscript(text)}
           value={transcript || ""}
           className=""
@@ -266,7 +269,7 @@ export default function RealTimeTranscription() {
             }
           }}
         >
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Text style={styles.sendButtonText}>{texts[language].send}</Text>
         </TouchableOpacity>
       </View>
       {error && <Text style={styles.errorText}>Error: {error}</Text>}
@@ -276,7 +279,7 @@ export default function RealTimeTranscription() {
         style={styles.button}
       >
         <Text style={styles.sendButtonText}>
-          {isRecording ? "Stop Recording" : "Start Recording"}
+          {isRecording ? texts[language].stopRecording : texts[language].startRecording}
         </Text>
       </TouchableOpacity>
     </View>
