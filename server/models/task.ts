@@ -21,7 +21,6 @@ const taskSchema = new Schema(
     },
     priority: {
         type: String,
-        enum: ["Low", "Medium", "High"],
         default: "Medium",
     },
     category: {

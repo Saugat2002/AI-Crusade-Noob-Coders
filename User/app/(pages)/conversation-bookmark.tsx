@@ -1,10 +1,10 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { View, Text, ActivityIndicator } from 'react-native';
+import React from 'react';
 
 export default function ConversationBookmark() {
   return (
-    <View>
-      <Text>ConversationBookmark</Text>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text style={{ marginTop: 120 }}>Feature Coming Soon!</Text>
     </View>
   );
 }

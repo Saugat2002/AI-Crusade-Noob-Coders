@@ -36,7 +36,9 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 prompt = """Please analyze the provided text and generate a comprehensive todo list following these requirements:
 
-Extract all tasks mentioned in the text and provide them in both English and Nepali
+Extract all tasks mentioned in the text and provide them in both English and Nepali.
+
+Note: The time field given below for both todoEnglish and todoNepali should be strictly in English Language.
 
 Format the output as a JSON object with the following structure:
 
@@ -55,13 +57,14 @@ Format the output as a JSON object with the following structure:
   "todosNepali": [
     {
       "task": "कार्य विवरण",
-      "time": "समय नेपाली फर्म्याटमा (जस्तै: बिहान ८ बजे)",
+      "time": "Time in 12-hour format (e.g., 8:00 AM)",
       "category": "एक: काम, व्यक्तिगत, स्वास्थ्य, किनमेल, दैनिकी, शिक्षा, सामाजिक, घरायसी",
       "priority": "एक: उच्च, मध्यम, न्यून",
       "completed": "false"
     }
   ]
-}"""
+}
+"""
 
 def generate_todo_list(text: str) -> Dict:
     """

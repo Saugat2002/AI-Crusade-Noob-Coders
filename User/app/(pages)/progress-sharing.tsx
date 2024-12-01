@@ -1,10 +1,33 @@
 import React from "react";
-import { View, Text, Button, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, Text, Button, StyleSheet, ScrollView, Alert ,Linking} from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
+import { useUser } from "@/context/UserContext";
 
 export default function ProgressSharing() {
+  const { user } = useUser();
   const screenWidth = Dimensions.get("window").width;
+  
+
+  const sendEmail = async () => {
+    const email = user?.guardiansEmail;
+    const subject = `Update on ${user?.fullName} - Recent Performance Decline`;
+    const body = `We've noticed a decline in ${user?.fullName}'s recent performance on the app. We recommend consulting their healthcare provider and encouraging continued engagement with the app's activities. \nKind Regards,\nSmaran`;
+
+    const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+      
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Error', 'No email app installed');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while trying to open email app');
+    }
+  };
 
   const game_data = {
     games: [
@@ -198,11 +221,7 @@ export default function ProgressSharing() {
         <View style={styles.buttonContainer}>
           <Button
             title="Notify Guardian"
-            onPress={() =>  Alert.alert(
-              "Notification",
-              "Guardian has been notified successfully.",
-              [{ text: "OK", onPress: () => console.log("Alert Closed") }]
-            )}
+            onPress={sendEmail}
             color="#6200ee"
           />
         </View>

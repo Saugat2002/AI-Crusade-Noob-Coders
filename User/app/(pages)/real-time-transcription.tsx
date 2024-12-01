@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  Alert,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
@@ -172,6 +180,7 @@ export default function RealTimeTranscription() {
               console.log(result.message);
               return;
             }
+            Alert.alert("Task Added", "Task added successfully");
             console.log("Task added successfully");
           } catch (err) {
             console.error("Error creating task:", err);
@@ -193,16 +202,107 @@ export default function RealTimeTranscription() {
           {transcript || "Transcription will appear here"}
         </Text>
       </View>
+      <View className="flex flex-row h-10 mx-16 gap-7 justify-between items-start">
+        <TextInput
+          style={styles.input}
+          placeholder="Type here..."
+          onChangeText={(text) => setTranscript(text)}
+          value={transcript || ""}
+          className=""
+        />
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={async () => {
+            if (transcript) {
+              const todos = await generateTodo(transcript);
+              console.log("Todos:", todos);
+              let newTodos;
+              if (language === "english") {
+                newTodos = todos.todosEnglish;
+              } else {
+                newTodos = todos.todosNepali;
+              }
+              console.log("New Todos:", newTodos);
+              for (let i = 0; i < newTodos.length; i++) {
+                const todo = newTodos[i];
+                console.log("Todo:", i, todo);
+
+                const request = new Request(
+                  `${process.env.EXPO_PUBLIC_SERVER_URI}/addTask`,
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      userId: user?._id,
+                      task: todo.task,
+                      time: todo.time,
+                      completed: todo.completed,
+                      priority: todo.priority,
+                      category: todo.category,
+                    }),
+                    credentials: "include",
+                  }
+                );
+                try {
+                  const response = await fetch(request);
+                  const result = await response.json();
+                  if (response.status !== 201) {
+                    console.log(result.message);
+                    return;
+                  }
+                  Alert.alert("Task Added", "Task added successfully");
+                  console.log("Task added successfully");
+                } catch (err) {
+                  console.error("Error creating task:", err);
+                }
+              }
+            } else {
+              Alert.alert(
+                "No Transcript",
+                "Please provide a transcript to send."
+              );
+            }
+          }}
+        >
+          <Text style={styles.sendButtonText}>Send</Text>
+        </TouchableOpacity>
+      </View>
       {error && <Text style={styles.errorText}>Error: {error}</Text>}
-      <Button
-        title={isRecording ? "Stop Recording" : "Start Recording"}
+      <TouchableOpacity
         onPress={isRecording ? stopRecording : startRecording}
-      />
+        className="mt-10 px-5 w-16"
+        style={styles.button}
+      >
+        <Text style={styles.sendButtonText}>
+          {isRecording ? "Stop Recording" : "Start Recording"}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  sendButtonText: {
+    color: "#fff",
+  },
+  sendButton: {
+    width: "30%",
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#007BFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  button: {
+    width: "100%",
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#007BFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -231,6 +331,15 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
+    marginBottom: 16,
+  },
+  input: {
+    width: "100%",
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
     marginBottom: 16,
   },
 });

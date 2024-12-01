@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -8,10 +8,22 @@ import {
   StatusBar,
   Modal,
   TextInput,
+  Platform,
 } from "react-native";
+import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLanguage } from "@/context/LanguageContext";
 import { useUser } from "@/context/UserContext";
 import texts from "@/utils/texts";
+
+// Configure notifications
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function DailyTasks() {
   const { language } = useLanguage();
@@ -21,21 +33,153 @@ export default function DailyTasks() {
   const [newTaskTime, setNewTaskTime] = useState("12:00 PM");
   const [editingTask, setEditingTask] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const {user} = useUser();
+  const { user } = useUser();
 
+  // Notification state
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notificationIds, setNotificationIds] = useState({});
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  // Load tasks and set up notifications on component mount
   useEffect(() => {
-    const getTasks = async () => {
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SERVER_URI}/fetchTasks`
-      );
-      const result = await response.json();
-      console.log(result);
+    // Request notification permissions and get token
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-      setTasks(result.tasks);
+    // Fetch existing tasks
+    const getTasks = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_SERVER_URI}/fetchTasks`
+        );
+        const result = await response.json();
+        setTasks(result.tasks);
+
+        // Reschedule notifications for existing tasks
+        result.tasks.forEach(scheduleTaskNotification);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
     };
     getTasks();
+
+    // Load saved notification IDs
+    const loadNotificationIds = async () => {
+      try {
+        const savedIds = await AsyncStorage.getItem('taskNotificationIds');
+        if (savedIds) {
+          setNotificationIds(JSON.parse(savedIds));
+        }
+      } catch (error) {
+        console.error('Failed to load notification IDs', error);
+      }
+    };
+    loadNotificationIds();
+
+    // Set up notification listeners
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log("Notification received:", notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log("Notification response:", response);
+    });
+
+    // Clean up listeners
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
 
+  // Save notification IDs to AsyncStorage
+  const saveNotificationIds = async (updatedIds) => {
+    try {
+      await AsyncStorage.setItem('taskNotificationIds', JSON.stringify(updatedIds));
+      setNotificationIds(updatedIds);
+    } catch (error) {
+      console.error('Failed to save notification IDs', error);
+    }
+  };
+
+  // Schedule notification for a specific task
+  const scheduleTaskNotification = async (task) => {
+    // Skip scheduling for completed tasks
+    if (task.completed) return null;
+
+    // Parse the time
+    const [time, period] = task.time.split(' ');
+    const [hours, minutes] = time.split(':').map(Number);
+    
+    // Convert to 24-hour format
+    let convertedHours = hours;
+    if (period === 'PM' && hours !== 12) {
+      convertedHours += 12;
+    } else if (period === 'AM' && hours === 12) {
+      convertedHours = 0;
+    }
+
+    // Create a date for today at the specified time
+    const now = new Date();
+    const notificationTime = new Date(
+      now.getFullYear(), 
+      now.getMonth(), 
+      now.getDate(), 
+      convertedHours, 
+      minutes
+    );
+
+    // If the time has already passed today, schedule for tomorrow
+    if (notificationTime <= now) {
+      notificationTime.setDate(notificationTime.getDate() + 1);
+    }
+
+    try {
+      // Schedule the notification
+      const identifier = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Task Reminder 📅",
+          body: `Time for: ${task.task}`,
+          data: { taskId: task._id },
+        },
+        trigger: notificationTime,
+      });
+
+      // Save the notification identifier for this task
+      const updatedIds = {
+        ...notificationIds,
+        [task._id]: identifier
+      };
+      await saveNotificationIds(updatedIds);
+
+      return identifier;
+    } catch (error) {
+      console.error("Failed to schedule notification:", error);
+      return null;
+    }
+  };
+
+  // Cancel a specific task's notification
+  const cancelTaskNotification = async (taskId) => {
+    try {
+      // Get the notification identifier for this task
+      const notificationId = notificationIds[taskId];
+
+      if (notificationId) {
+        // Cancel the scheduled notification
+        await Notifications.cancelScheduledNotificationAsync(notificationId);
+
+        // Remove the notification ID from storage
+        const updatedIds = { ...notificationIds };
+        delete updatedIds[taskId];
+        await saveNotificationIds(updatedIds);
+      }
+    } catch (error) {
+      console.error('Failed to cancel notification', error);
+    }
+  };
+
+  // Add a new task
   const handleAddTask = async () => {
     if (newTaskTitle.trim() === "") return;
 
@@ -48,23 +192,30 @@ export default function DailyTasks() {
       category: "Daily Routine",
     };
 
-    const request = new Request(
-      `${process.env.EXPO_PUBLIC_SERVER_URI}/addTask`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newTask),
-        credentials: "include",
-      }
-    );
-
     try {
-      const response = await fetch(request);
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_SERVER_URI}/addTask`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newTask),
+          credentials: "include",
+        }
+      );
       const result = await response.json();
+
       if (response.status === 200) {
-        setTasks([...tasks, { ...newTask, _id: result.taskId }]);
+        const taskWithId = { ...newTask, _id: result.taskId };
+        
+        // Add task to list
+        setTasks([...tasks, taskWithId]);
+        
+        // Schedule notification
+        await scheduleTaskNotification(taskWithId);
+        
+        // Reset modal state
         setModalVisible(false);
         setNewTaskTitle("");
         setNewTaskTime("12:00 PM");
@@ -76,6 +227,7 @@ export default function DailyTasks() {
     }
   };
 
+  // Edit an existing task
   const handleEditTask = async () => {
     if (!editingTask || newTaskTitle.trim() === "") return;
 
@@ -88,27 +240,41 @@ export default function DailyTasks() {
       category: editingTask.category,
     };
 
-    const request = new Request(
-      `${process.env.EXPO_PUBLIC_SERVER_URI}/updateTask`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedTask),
-        credentials: "include",
-      }
-    );
-
     try {
-      const response = await fetch(request);
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_SERVER_URI}/updateTask`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedTask),
+          credentials: "include",
+        }
+      );
       const result = await response.json();
+
       if (response.status === 200) {
+        const updatedTaskWithDetails = { 
+          ...editingTask, 
+          task: newTaskTitle, 
+          time: newTaskTime 
+        };
+        
+        // Cancel previous notification
+        await cancelTaskNotification(editingTask._id);
+        
+        // Schedule new notification
+        await scheduleTaskNotification(updatedTaskWithDetails);
+        
+        // Update tasks list
         setTasks(
           tasks.map((task) =>
-            task._id === editingTask._id ? updatedTask : task
+            task._id === editingTask._id ? updatedTaskWithDetails : task
           )
         );
+        
+        // Reset modal state
         setEditModalVisible(false);
         setNewTaskTitle("");
         setNewTaskTime("12:00 PM");
@@ -121,23 +287,27 @@ export default function DailyTasks() {
     }
   };
 
+  // Delete a task
   const handleDeleteTask = async (taskId) => {
-    const request = new Request(
-      `${process.env.EXPO_PUBLIC_SERVER_URI}/deleteTask`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ taskId }),
-        credentials: "include",
-      }
-    );
-
     try {
-      const response = await fetch(request);
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_SERVER_URI}/deleteTask`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ taskId }),
+          credentials: "include",
+        }
+      );
       const result = await response.json();
+
       if (response.status === 200) {
+        // Cancel the notification for this task
+        await cancelTaskNotification(taskId);
+
+        // Remove the task from the list
         setTasks(tasks.filter((task) => task._id !== taskId));
       } else {
         console.error("Failed to delete task:", result.message);
@@ -147,53 +317,49 @@ export default function DailyTasks() {
     }
   };
 
+  // Toggle task completion
   const toggleTaskCompletion = async (taskId) => {
-    const task1 = tasks.find((task) => task._id === taskId);
-    if (!task1) return;
-    console.log(task1);
+    const task = tasks.find((t) => t._id === taskId);
+    if (!task) return;
 
     const updatedTask = {
-      ...task1,
-      completed: !task1.completed,
+      ...task,
+      completed: !task.completed,
     };
-    console.log(updatedTask);
-    const {
-      taskId: _id,
-      task,
-      time,
-      completed,
-      priority,
-      category,
-    } = updatedTask;    
-
-    const request = new Request(
-      `${process.env.EXPO_PUBLIC_SERVER_URI}/updateTask`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          taskId,
-          task,
-          time,
-          completed,
-          priority,
-          category,
-        }),
-        credentials: "include",
-      }
-    );
 
     try {
-      const response = await fetch(request);
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_SERVER_URI}/updateTask`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            taskId,
+            ...updatedTask,
+          }),
+          credentials: "include",
+        }
+      );
       const result = await response.json();
+
       if (response.status === 200) {
+        // Update tasks list
         setTasks(
-          tasks.map((task) =>
-            task._id === taskId ? { ...task, completed: !task.completed } : task
+          tasks.map((t) =>
+            t._id === taskId 
+              ? { ...t, completed: !t.completed } 
+              : t
           )
         );
+
+        // Manage notification based on completion status
+        if (updatedTask.completed) {
+          await cancelTaskNotification(taskId);
+        } else {
+          await scheduleTaskNotification(updatedTask);
+        }
       } else {
         console.error("Failed to update task:", result.message);
       }
@@ -202,13 +368,39 @@ export default function DailyTasks() {
     }
   };
 
-  const openEditModal = (task) => {
-    setEditingTask(task);
-    setNewTaskTitle(task.task);
-    setNewTaskTime(task.time);
-    setEditModalVisible(true);
-  };
+  // Request notification permissions
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
 
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    
+    token = (await Notifications.getExpoPushTokenAsync({ 
+      projectId: process.env.EXPO_PUBLIC_PROJECT_ID 
+    })).data;
+    
+    return token;
+  }
+
+  // Render task item
   const TaskItem = ({ item }) => (
     <View style={styles.taskItem}>
       <TouchableOpacity
@@ -228,7 +420,12 @@ export default function DailyTasks() {
       <View style={styles.actionButtons}>
         <TouchableOpacity
           style={styles.editButton}
-          onPress={() => openEditModal(item)}
+          onPress={() => {
+            setEditingTask(item);
+            setNewTaskTitle(item.task);
+            setNewTaskTime(item.time);
+            setEditModalVisible(true);
+          }}
         >
           <Text style={styles.editButtonText}>✎</Text>
         </TouchableOpacity>
@@ -308,6 +505,7 @@ export default function DailyTasks() {
           </View>
         </View>
       </Modal>
+
 
       {/* Edit Task Modal */}
       <Modal

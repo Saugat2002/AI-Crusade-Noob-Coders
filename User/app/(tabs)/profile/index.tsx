@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize:19,
     fontWeight: "600",
     color: "#333",
     marginLeft: 10,
@@ -239,11 +239,11 @@ const styles = StyleSheet.create({
     borderBottomColor: "#F0F0F0",
   },
   label: {
-    fontSize: 20,
+    fontSize: 15,
     color: "#666",
   },
   value: {
-    fontSize: 20,
+    fontSize: 15,
     color: "#333",
     fontWeight: "500",
   },
