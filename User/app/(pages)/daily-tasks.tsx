@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   taskTitle: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: "600",
     color: "#333",
   },
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     color: "#888",
   },
   timeText: {
-    fontSize: 14,
+    fontSize: 18,
     color: "#666",
     marginTop: 4,
   },

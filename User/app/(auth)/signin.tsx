@@ -8,20 +8,18 @@ import {
 } from "react-native";
 import { Link, router } from "expo-router";
 import { useUser } from "@/context/UserContext";
-import { useLanguage } from "@/context/LanguageContext"; // Adjust the import as needed
+import { useLanguage } from "@/context/LanguageContext";
 import texts from "@/utils/texts";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setUser } = useUser();
-  const { language, setLanguage } = useLanguage(); // Adjust the destructuring as needed
+  const { language, setLanguage } = useLanguage();
   console.log(language);
   
-
   const handleSignIn = async (e: GestureResponderEvent) => {
     e.preventDefault();
-    // Handle sign
     const request = new Request(
       `${process.env.EXPO_PUBLIC_SERVER_URI}/signin`,
       {
@@ -47,7 +45,7 @@ const SignIn = () => {
       console.error("Error:", error);
     }
   };
-
+  
   return (
     <>
       <View className="flex-1 justify-center items-center bg-white">
@@ -82,13 +80,27 @@ const SignIn = () => {
             <Text className="underline">{texts[language].signUp}</Text>
           </Link>
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            setLanguage(language === "english" ? "nepali" : "english");
-          }}
-        >
-          <Text>{texts[language].switch}</Text>
-        </TouchableOpacity>
+        <View className="mt-6"> {/* Added margin-top of 6 (1.5rem/24px) */}
+          <TouchableOpacity
+            className="flex-row items-center justify-center bg-white border border-blue-500 rounded-full px-4 py-2 self-center shadow-sm"
+            onPress={() => {
+              setLanguage(language === "english" ? "nepali" : "english");
+            }}
+          >
+            <View className="flex-row items-center">
+              {language === "english" ? (
+                <Text className="text-blue-500 font-semibold mr-2">🇬🇧 English</Text>
+              ) : (
+                <Text className="text-blue-500 font-semibold mr-2">🇳🇵 Nepali</Text>
+              )}
+              <View className="bg-blue-100 rounded-full p-1">
+                <Text className="text-blue-700 text-xs">
+                  {language === "english" ? "NP" : "EN"}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     </>
   );

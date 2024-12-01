@@ -5,8 +5,11 @@ import {
     GamepadIcon,
     BrainIcon,
     PuzzleIcon,
-    HeartPulseIcon
+    HeartPulseIcon,
+    Book,
+    BookAIcon
 } from "lucide-react-native";
+import SudokuGame from "./sudoku";
 
 export default function ProgressSharing() {
     const games = [
@@ -22,14 +25,14 @@ export default function ProgressSharing() {
             title: "Gaau Khane Katha",
             description: "Solve questions to enhance cognitive skills",
             route: "/cognitive-exercises/gaau-khane-katha",
-            icon: PuzzleIcon
+            icon: BookAIcon
         },
         {
             id: 3,
             title: "Sudoku",
             description: "Play with numbers",
             route: "/cognitive-exercises/sudoku",
-            icon: HeartPulseIcon
+            icon: GamepadIcon
         }
     ];
 
@@ -84,13 +87,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     header: {
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: '700',
         color: '#2C3E50',
         marginBottom: 8,
     },
     subHeader: {
-        fontSize: 16,
+        fontSize: 22,
         color: '#7F8C8D',
     },
     scrollViewContent: {
@@ -128,13 +131,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     gameTitle: {
-        fontSize: 18,
+        fontSize: 23,
         fontWeight: '600',
         color: '#2C3E50',
         marginBottom: 5,
     },
     gameDescription: {
-        fontSize: 14,
+        fontSize: 18,
         color: '#7F8C8D',
         lineHeight: 20,
     },

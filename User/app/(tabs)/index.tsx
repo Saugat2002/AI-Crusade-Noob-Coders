@@ -10,6 +10,8 @@ import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons"; // Make sure to install expo icons
 import texts from "@/utils/texts";
 import { useLanguage } from "@/context/LanguageContext";
+import { Brain } from "lucide-react-native";
+
 export default function Index() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { language, setLanguage } = useLanguage();
@@ -99,9 +101,16 @@ export default function Index() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome to Dementia Care</Text>
+      <View className="items-center mb-4">
+        <Brain 
+          color="#ffffff"  // Tailwind blue-600 
+          size={100} 
+          className="mb-2" 
+        />
+        <Text style={styles.title}>{texts[language].welcome}</Text>
+      </View>
         <Text style={styles.subtitle}>
-          Your AI-Powered Dementia Support Companion
+          {texts[language].welcomeSub}
         </Text>
       </View>
 
@@ -114,7 +123,7 @@ export default function Index() {
               router.push(feature.route as any);
             }}
           >
-            <MaterialIcons name={feature.icon} size={32} color="#4A90E2" />
+            <MaterialIcons name={feature.icon} size={40} color="#4A90E2" />
             <Text style={styles.featureTitle}>{feature.title}</Text>
             <Text style={styles.featureDescription}>{feature.description}</Text>
           </TouchableOpacity>
@@ -137,13 +146,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 36,
     fontWeight: "bold",
     color: "white",
     textAlign: "center",
+    marginTop: 20,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 22,
     color: "white",
     textAlign: "center",
     marginTop: 8,
@@ -171,14 +181,14 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   featureTitle: {
-    fontSize: 16,
+    fontSize:22,
     fontWeight: "bold",
     color: "#333",
     marginTop: 10,
     textAlign: "center",
   },
   featureDescription: {
-    fontSize: 12,
+    fontSize: 16,
     color: "#666",
     marginTop: 5,
     textAlign: "center",

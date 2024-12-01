@@ -124,13 +124,27 @@ const SignUp = () => {
         <Text style={styles.buttonText}>{texts[language].signUp}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-          onPress={() => {
-            setLanguage(language === "english" ? "nepali" : "english");
-          }}
-        >
-          <Text>{texts[language].switch}</Text>
-        </TouchableOpacity>
+      <View className="mt-6"> {/* Added margin-top of 6 (1.5rem/24px) */}
+          <TouchableOpacity
+            className="flex-row items-center justify-center bg-white border border-blue-500 rounded-full px-4 py-2 self-center shadow-sm"
+            onPress={() => {
+              setLanguage(language === "english" ? "nepali" : "english");
+            }}
+          >
+            <View className="flex-row items-center">
+              {language === "english" ? (
+                <Text className="text-blue-500 font-semibold mr-2">🇬🇧 English</Text>
+              ) : (
+                <Text className="text-blue-500 font-semibold mr-2">🇳🇵 Nepali</Text>
+              )}
+              <View className="bg-blue-100 rounded-full p-1">
+                <Text className="text-blue-700 text-xs">
+                  {language === "english" ? "NP" : "EN"}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
     </View>
   );
 };

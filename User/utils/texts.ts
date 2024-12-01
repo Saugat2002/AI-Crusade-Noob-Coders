@@ -64,6 +64,8 @@ const texts = {
     addTask: "Add Task",
     editTask: "Edit Task",
     saveChanges: "Save Changes",
+    welcome: "Welcome to Smaran",
+    welcomeSub: "Your AI-Powered Support Companion",
   },
   nepali: {
     signIn: "साइन इन",
@@ -130,6 +132,8 @@ const texts = {
     addTask: "कार्य थप्नुहोस्",
     editTask: "कार्य सम्पादन गर्नुहोस्",
     saveChanges: "परिवर्तनहरू सुरक्षित गर्नुहोस्",
+    welcome: "स्मरण मा हजुरलाई स्वागत छ",
+    welcomeSub: "तपाईंको AI-संचालित सहायता साथी"
   },
 };
 

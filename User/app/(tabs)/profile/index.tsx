@@ -199,13 +199,13 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   userName: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     color: "white",
     marginBottom: 5,
   },
   userEmail: {
-    fontSize: 16,
+    fontSize: 18,
     color: "rgba(255, 255, 255, 0.8)",
   },
   section: {
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "600",
     color: "#333",
     marginLeft: 10,
@@ -239,11 +239,11 @@ const styles = StyleSheet.create({
     borderBottomColor: "#F0F0F0",
   },
   label: {
-    fontSize: 16,
+    fontSize: 20,
     color: "#666",
   },
   value: {
-    fontSize: 16,
+    fontSize: 20,
     color: "#333",
     fontWeight: "500",
   },

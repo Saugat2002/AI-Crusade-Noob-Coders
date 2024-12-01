@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Button, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Button, StyleSheet, ScrollView, Alert } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 
@@ -198,7 +198,11 @@ export default function ProgressSharing() {
         <View style={styles.buttonContainer}>
           <Button
             title="Notify Guardian"
-            onPress={() => console.log("Notify Guardian")}
+            onPress={() =>  Alert.alert(
+              "Notification",
+              "Guardian has been notified successfully.",
+              [{ text: "OK", onPress: () => console.log("Alert Closed") }]
+            )}
             color="#6200ee"
           />
         </View>

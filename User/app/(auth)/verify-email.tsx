@@ -1,13 +1,13 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Link, useGlobalSearchParams } from "expo-router";
-import { useLanguage } from "@/context/LanguageContext"; // Adjust the import as needed
+import { useLanguage } from "@/context/LanguageContext";
 import texts from "@/utils/texts";
 
-export default function verifyEmail() {
+export default function VerifyEmail() {
   const [validUrl, setValidUrl] = useState(false);
   const queryParams = useGlobalSearchParams();
-  const { language, setLanguage } = useLanguage(); // Adjust the import as needed
+  const { language, setLanguage } = useLanguage();
 
   console.log("Query Params", queryParams);
 
@@ -32,22 +32,48 @@ export default function verifyEmail() {
   }, [queryParams]);
 
   return (
-    <View>
-      {validUrl ? (
-        <View>
-          <Text>{texts[language].emailVerified}</Text>
-          <Link href="/signin">{texts[language].signIn}</Link>
-          <TouchableOpacity
-          onPress={() => {
-            setLanguage(language === "english" ? "nepali" : "english");
-          }}
-        >
-          <Text>{texts[language].switch}</Text>
-        </TouchableOpacity>
-        </View>
-      ) : (
-        <Text>404 not Found</Text>
-      )}
-    </View>
+    <SafeAreaView className="flex-1 bg-blue-50">
+      <View className="flex-1 justify-center items-center px-6">
+        {validUrl ? (
+          <View className="w-full bg-white rounded-xl shadow-lg p-6 items-center">
+            <Text className="text-2xl font-bold text-blue-600 mb-4">
+              {texts[language].emailVerified}
+            </Text>
+            
+            <TouchableOpacity 
+              className="bg-blue-500 rounded-lg py-3 px-6 mb-4 w-full items-center"
+              onPress={() => {
+                // Add sign in navigation logic here
+                console.log("Sign In");
+              }}
+            >
+              <Text className="text-white font-semibold">
+                {texts[language].signIn}
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              className="bg-white border border-blue-500 rounded-lg py-3 px-6 w-full items-center"
+              onPress={() => {
+                setLanguage(language === "english" ? "nepali" : "english");
+              }}
+            >
+              <Text className="text-blue-500 font-semibold">
+                {texts[language].switch}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View className="w-full bg-white rounded-xl shadow-lg p-6 items-center">
+            <Text className="text-2xl font-bold text-red-500 mb-4">
+              404 Not Found
+            </Text>
+            <Text className="text-gray-600 text-center">
+              The email verification link is invalid or has expired.
+            </Text>
+          </View>
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
